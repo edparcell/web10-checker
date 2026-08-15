@@ -1,0 +1,25 @@
+[project]
+name = "web10-checker"
+version = "0.1.0"
+description = "Conformance checker for the Web 1.0 Specification (2026 Edition): no scripts, no third parties, no cookies, no bloat."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Ed Parcell" }]
+dependencies = [
+    "requests>=2.31",
+    "beautifulsoup4>=4.12",
+]
+
+[project.scripts]
+web10 = "web10check.cli:main"
+
+[dependency-groups]
+dev = ["pytest>=8.0"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/web10check"]
