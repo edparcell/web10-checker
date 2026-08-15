@@ -29,6 +29,7 @@ class ParsedPage:
     event_attrs: list[str] = field(default_factory=list)
     js_urls: list[str] = field(default_factory=list)
     script_preloads: list[str] = field(default_factory=list)
+    script_srcs: list[str] = field(default_factory=list)  # also resources (TP-01, RQ-01)
     # Resource references (TP-01, WT-*, RQ-01, FR-01)
     refs: list[RawRef] = field(default_factory=list)
     iframes: list[str] = field(default_factory=list)
@@ -91,6 +92,8 @@ def parse_html(html: str) -> ParsedPage:
     for script in soup.find_all("script"):
         src = script.get("src")
         page.scripts.append(f'<script src="{src}">' if src else "inline <script>")
+        if src and not src.startswith("data:"):
+            page.script_srcs.append(src)
 
     for tag in soup.find_all(True):
         for attr, value in tag.attrs.items():
@@ -113,6 +116,8 @@ def parse_html(html: str) -> ParsedPage:
         as_attr = (link.get("as") or "").lower()
         if "modulepreload" in rel or ("preload" in rel and as_attr == "script"):
             page.script_preloads.append(f'<link rel="{" ".join(rel)}" href="{href[:80]}">')
+            if not href.startswith("data:"):
+                page.script_srcs.append(href)
         elif "stylesheet" in rel:
             page.refs.append(RawRef(href, "stylesheet", "<link rel=stylesheet>"))
         elif "icon" in rel or "apple-touch-icon" in rel:

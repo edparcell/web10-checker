@@ -67,6 +67,11 @@ def check_page(fetcher, url: str) -> PageResult:
     for ref in parsed.refs:
         classify_ref(ref.url, ref.source, ref.kind, base)
 
+    # Script URLs are resources too: a third-party script is both JS-01 and
+    # TP-01, and every script src counts toward requests and weight.
+    for src in parsed.script_srcs:
+        classify_ref(src, "<script src>", "script", base)
+
     for iframe_src in parsed.iframes:
         disposition, absolute = fetcher.classify(base, iframe_src)
         if disposition == "skip" or not note_request(absolute):

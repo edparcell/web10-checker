@@ -31,6 +31,15 @@ def test_script_preload_is_js(check_html):
     assert not rule(check_html(html), "JS-01").passed
 
 
+def test_third_party_script_is_both_js_and_tp(check_html):
+    html = CLEAN_PAGE.replace(
+        "</body>", '<script src="https://www.googletagmanager.com/gtag/js"></script></body>')
+    result = check_html(html)
+    assert not rule(result, "JS-01").passed
+    assert not rule(result, "TP-01").passed
+    assert result.grade == "F"
+
+
 def test_third_party_image_is_major(check_html):
     html = CLEAN_PAGE.replace(
         "</body>", '<img src="https://cdn.tracker.net/pixel.gif" alt=""></body>')
