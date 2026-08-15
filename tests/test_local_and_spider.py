@@ -29,6 +29,15 @@ def test_local_spider_stays_on_site(tmp_path):
     assert site.grade == "A"
 
 
+def test_relative_target_resolves_against_cwd(tmp_path, monkeypatch):
+    site_dir = tmp_path / "site"
+    site_dir.mkdir()
+    make_site(site_dir)
+    monkeypatch.chdir(tmp_path)
+    fetcher = LocalFetcher("site")
+    assert fetcher.resolve_target("site").endswith("site/index.html")
+
+
 def test_local_absolute_url_is_third_party(tmp_path):
     (tmp_path / "index.html").write_text(
         CLEAN_PAGE.replace(

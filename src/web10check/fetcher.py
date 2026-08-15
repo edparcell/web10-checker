@@ -114,10 +114,7 @@ class LocalFetcher:
         self.root = Path(root).resolve()
 
     def resolve_target(self, target: str | Path) -> str:
-        path = Path(target)
-        if not path.is_absolute():
-            path = self.root / path
-        path = path.resolve()
+        path = Path(target).resolve()  # relative targets are relative to cwd
         if path.is_dir():
             path = path / "index.html"
         return path.as_posix()
