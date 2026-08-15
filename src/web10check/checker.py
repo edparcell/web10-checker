@@ -28,6 +28,9 @@ def check_page(fetcher, url: str) -> PageResult:
     fr: FetchResult = fetcher.fetch_page(url)
     if fr.error and not fr.content:
         return PageResult(url=url, ok=False, error=fr.error, status=fr.status)
+    if not fr.text.strip():
+        return PageResult(url=url, ok=False, status=fr.status,
+                          error=f"empty response (HTTP {fr.status})")
 
     base = fr.final_url
     parsed = parse_html(fr.text)

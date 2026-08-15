@@ -67,6 +67,13 @@ def test_http_spider_and_worst_page_grade():
     assert site.grade == "D"
 
 
+def test_empty_response_is_not_a_page():
+    fetcher = StubFetcher({"https://example.com/": ""})
+    site = check_targets(fetcher, ["https://example.com/"])
+    assert not site.pages[0].ok
+    assert "empty response" in site.pages[0].error
+
+
 def test_unreachable_page_reported():
     fetcher = StubFetcher({})
     site = check_targets(fetcher, ["https://example.com/"])
