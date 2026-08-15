@@ -57,7 +57,8 @@ year of certification. Grades D and F are a **fail**.
   first-party CSS, and enumerate referenced resources. No script execution is
   required — which is rather the point.
 - The checker never fetches third-party resources; their presence alone is the
-  fault. Transfer weight therefore counts first-party bytes only.
+  fault. Transfer weight therefore counts first-party bytes only, measured
+  uncompressed (what the browser must actually process).
 - `<noscript>` content is ignored (it is what a conforming visitor sees anyway).
 - When checking a local directory before deployment, any absolute `http(s)`
   reference is treated as third-party.

@@ -9,6 +9,10 @@ authors = [{ name = "Ed Parcell" }]
 dependencies = [
     "requests>=2.31",
     "beautifulsoup4>=4.12",
+    # Some CDNs (Berkshire Hathaway's, notably) send brotli regardless of
+    # Accept-Encoding; without decoders the checker would grade gibberish.
+    "brotli>=1.1",
+    "zstandard>=0.22",
 ]
 
 [project.scripts]
