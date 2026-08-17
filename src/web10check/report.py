@@ -46,7 +46,7 @@ def _page_text(page: PageResult) -> list[str]:
         f" | {_fmt_bytes(page.weight_bytes)} first-party, {page.request_count} requests"
     )
     for rr in page.rule_results:
-        mark = "pass" if rr.passed else ("MAJOR" if rr.severity == "major" else "minor")
+        mark = "pass" if rr.passed else ("MAJOR" if rr.majors else "minor")
         lines.append(f"   [{mark:>5}] {rr.rule_id} {rr.name}")
         for occ in rr.occurrences[:5]:
             lines.append(f"           - {occ}")
@@ -126,12 +126,7 @@ def _page_html(page: PageResult) -> str:
         if rr.passed:
             result = "<span class='pass'>pass</span>"
         else:
-            if rr.severity == "major":
-                label = "MAJOR"
-            elif rr.counted == 0:
-                label = "counted under WT-01"
-            else:
-                label = f"{rr.counted} minor"
+            label = "MAJOR" if rr.majors else f"{rr.minors} minor"
             occs = "".join(
                 f"<li>{html.escape(o)}</li>" for o in rr.occurrences[:5]
             )

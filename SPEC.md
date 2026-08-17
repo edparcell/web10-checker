@@ -9,34 +9,30 @@ Conformance is assessed per page. Faults are classified as **major** or
 **minor**: a major fault fails the page outright, minor faults accumulate.
 A site's grade is the grade of its worst page.
 
-## Major faults
+## Faults
 
-Major faults are counted once per rule per page: having JavaScript is one
-fault, however many scripts you have. Occurrences are listed in the report.
+Every finding carries a severity, and severity belongs to the finding, not
+the rule: a rule may grade minor at one threshold and major at another.
+Major faults are counted once per rule per page - having JavaScript is one
+fault, however many scripts you have. Minor faults are counted per
+occurrence, capped at 3 per rule per page. Occurrences are listed in the
+report.
 
-| ID    | Fault | Definition |
-|-------|-------|------------|
-| JS-01 | JavaScript | Any `<script>` element (inline or external), any `on*` event-handler attribute, any `javascript:` URL, or any `<link>` that preloads a script (`rel="modulepreload"`, or `rel="preload" as="script"`). |
-| TP-01 | Third-party request | Any resource (stylesheet, image, font, media, frame, preload) referenced from outside the page's own site. Two hosts are the same site if they share a registrable domain (`www.example.com` and `images.example.com` are the same site; `example.com` and `cdn.example.net` are not). Discovered in HTML and in first-party CSS (`url()`, `@import`). |
-| CK-01 | Cookies | Any `Set-Cookie` header on the page or on any first-party resource. |
-| WT-01 | Excessive transfer | Total first-party transfer (page plus all first-party resources) exceeds **2 MB**. |
-| AV-01 | Autoplay | Any `<video>` or `<audio>` element with the `autoplay` attribute. |
-
-## Minor faults
-
-Minor faults are counted per occurrence, capped at 3 per rule per page.
-
-| ID    | Fault | Definition |
-|-------|-------|------------|
-| HY-01 | Missing doctype | No `<!DOCTYPE html>`. |
-| HY-02 | Missing title | No `<title>`, or an empty one. |
-| HY-03 | Missing language | No `lang` attribute on `<html>`. |
-| HY-04 | Missing charset | No character-encoding declaration (`<meta charset>` or equivalent). |
-| HY-05 | Missing alt text | An `<img>` without an `alt` attribute. |
-| FT-01 | Web fonts | Any `@font-face` in first-party CSS. |
-| WT-02 | High transfer | Total first-party transfer exceeds **512 KB**. Transfers over 2 MB are counted once, as WT-01. |
-| RQ-01 | Excessive requests | More than **20** resource requests for a single page. |
-| FR-01 | First-party frame | An `<iframe>` pointing at the page's own origin. (Third-party frames are TP-01, which is major.) |
+| ID    | Fault | Definition | Severity |
+|-------|-------|------------|----------|
+| JS-01 | JavaScript | Any `<script>` element (inline or external), any `on*` event-handler attribute, any `javascript:` URL, or any `<link>` that preloads a script (`rel="modulepreload"`, or `rel="preload" as="script"`). | Major |
+| TP-01 | Third-party request | Any resource (script, stylesheet, image, font, media, frame, preload) referenced from outside the page's own site. Two hosts are the same site if they share a registrable domain (`www.example.com` and `images.example.com` are the same site; `example.com` and `cdn.example.net` are not). Discovered in HTML and in first-party CSS (`url()`, `@import`). | Major |
+| CK-01 | Cookies | Any `Set-Cookie` header on the page or on any first-party resource. | Major |
+| WT-01 | Excessive transfer | Total first-party transfer: the page plus all first-party resources. | Minor over **512 KB**; major over **2 MB** |
+| AV-01 | Autoplay | Any `<video>` or `<audio>` element with the `autoplay` attribute. | Major |
+| HY-01 | Missing doctype | No `<!DOCTYPE html>`. | Minor |
+| HY-02 | Missing title | No `<title>`, or an empty one. | Minor |
+| HY-03 | Missing language | No `lang` attribute on `<html>`. | Minor |
+| HY-04 | Missing charset | No character-encoding declaration (`<meta charset>` or equivalent). | Minor |
+| HY-05 | Missing alt text | An `<img>` without an `alt` attribute. | Minor |
+| FT-01 | Web fonts | Any `@font-face` in first-party CSS. | Minor |
+| RQ-01 | Excessive requests | More than **20** resource requests for a single page. | Minor |
+| FR-01 | First-party frame | An `<iframe>` pointing at the page's own origin. (Third-party frames are TP-01.) | Minor |
 
 ## Grades
 

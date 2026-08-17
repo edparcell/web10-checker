@@ -6,25 +6,45 @@ from dataclasses import dataclass, field
 
 
 @dataclass
+class Finding:
+    """A single fault occurrence. Severity belongs to the finding, not the
+    rule: one rule may grade minor at one threshold and major at another."""
+
+    severity: str  # "major" | "minor"
+    detail: str
+
+    def to_dict(self) -> dict:
+        return {"severity": self.severity, "detail": self.detail}
+
+
+@dataclass
 class RuleResult:
     rule_id: str
     name: str
-    severity: str  # "major" | "minor"
-    occurrences: list[str] = field(default_factory=list)
-    counted: int = 0  # faults counted toward the grade (minors are capped)
+    findings: list[Finding] = field(default_factory=list)
+    majors: int = 0  # counted majors (at most 1 per rule per page)
+    minors: int = 0  # counted minors (capped per rule per page)
 
     @property
     def passed(self) -> bool:
-        return not self.occurrences
+        return not self.findings
+
+    @property
+    def occurrences(self) -> list[str]:
+        return [f.detail for f in self.findings]
+
+    @property
+    def counted(self) -> int:
+        return self.majors + self.minors
 
     def to_dict(self) -> dict:
         return {
             "rule_id": self.rule_id,
             "name": self.name,
-            "severity": self.severity,
             "passed": self.passed,
-            "counted": self.counted,
-            "occurrences": self.occurrences,
+            "majors": self.majors,
+            "minors": self.minors,
+            "findings": [f.to_dict() for f in self.findings],
         }
 
 

@@ -131,18 +131,16 @@ def test_cookies_are_major(check_html):
     assert result.grade == "D"
 
 
-def test_weight_minor_and_major(check_html):
+def test_weight_severity_scales_with_threshold(check_html):
     html = CLEAN_PAGE.replace("</body>", '<img src="big.jpg" alt="big"></body>')
     heavy = check_html(html, sizes={"https://example.com/big.jpg": 600 * 1024})
-    assert not rule(heavy, "WT-02").passed
-    assert rule(heavy, "WT-01").passed
+    wt = rule(heavy, "WT-01")
+    assert not wt.passed
+    assert wt.minors == 1 and wt.majors == 0
+    assert heavy.grade == "B"
     obese = check_html(html, sizes={"https://example.com/big.jpg": 3 * 1024 * 1024})
-    assert not rule(obese, "WT-01").passed
-    # Over 2 MB fires both weight rules but is counted once, as the major.
-    wt2 = rule(obese, "WT-02")
-    assert not wt2.passed
-    assert wt2.counted == 0
-    assert "counted once, under WT-01" in wt2.occurrences
+    wt = rule(obese, "WT-01")
+    assert wt.majors == 1 and wt.minors == 0  # one fault, graded major
     assert obese.minors == 0
     assert obese.grade == "D"
 
@@ -152,7 +150,6 @@ def test_preload_none_media_is_weight_exempt(check_html):
         "</body>", '<video controls preload="none" src="big.mp4"></video></body>')
     result = check_html(html, sizes={"https://example.com/big.mp4": 50 * 1024 * 1024})
     assert rule(result, "WT-01").passed
-    assert rule(result, "WT-02").passed
     assert result.request_count == 2  # still counted as a request
 
 
