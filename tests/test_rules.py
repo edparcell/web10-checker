@@ -77,8 +77,10 @@ def test_empty_alt_is_fine(check_html):
 
 
 def test_hygiene_minors(check_html):
-    result = check_html("<html><body><p>bare</p></body></html>",
-                        html_content_type="text/html")
+    result = check_html(
+        "<html><body><p>A real page with a real paragraph of content, "
+        "just missing its hygiene elements.</p></body></html>",
+        html_content_type="text/html")
     for rule_id in ("HY-01", "HY-02", "HY-03", "HY-04"):
         assert not rule(result, rule_id).passed
     assert result.minors == 4

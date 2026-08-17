@@ -1,6 +1,6 @@
 [project]
 name = "web10-checker"
-version = "0.4.0"
+version = "0.4.1"
 description = "Conformance checker for the Web 1.0 Specification (2026 Edition): no scripts, no third parties, no cookies, no bloat."
 readme = "README.md"
 requires-python = ">=3.10"

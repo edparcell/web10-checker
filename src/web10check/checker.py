@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import re
 from collections import deque
 from urllib.parse import urlsplit
 
@@ -24,16 +25,42 @@ def _charset_from_content_type(content_type: str) -> str | None:
     return None
 
 
-def check_page(fetcher, url: str) -> PageResult:
-    fr: FetchResult = fetcher.fetch_page(url)
-    if fr.error and not fr.content:
-        return PageResult(url=url, ok=False, error=fr.error, status=fr.status)
-    if not fr.text.strip():
-        return PageResult(url=url, ok=False, status=fr.status,
-                          error=f"empty response (HTTP {fr.status})")
+# CDN edges sometimes serve their own error or challenge pages with a
+# success status (CloudFront's "Request blocked" page arrives as HTTP 200).
+# Grading those as websites produced false passes; they are unassessable.
+_BLOCK_TITLE = re.compile(
+    r"error|denied|blocked|forbidden|unavailable|captcha|just a moment"
+    r"|attention required|could not be satisfied", re.IGNORECASE)
 
-    base = fr.final_url
-    parsed = parse_html(fr.text)
+
+def check_page(fetcher, url: str) -> PageResult:
+    fetch_url = url
+    for hop in range(2):
+        fr: FetchResult = fetcher.fetch_page(fetch_url)
+        if fr.error and not fr.content:
+            return PageResult(url=url, ok=False, error=fr.error, status=fr.status)
+        if not fr.text.strip():
+            return PageResult(url=url, ok=False, status=fr.status,
+                              error=f"empty response (HTTP {fr.status})")
+        base = fr.final_url
+        parsed = parse_html(fr.text)
+        if (parsed.title and len(fr.content) < 8192
+                and _BLOCK_TITLE.search(parsed.title)):
+            return PageResult(url=url, ok=False, status=fr.status,
+                              error=f'served a block page titled "{parsed.title}"')
+        if (len(fr.content) < 1024 and not parsed.title
+                and not parsed.has_doctype and parsed.text_chars < 25):
+            return PageResult(url=url, ok=False, status=fr.status,
+                              error="response too small to assess "
+                                    f"({len(fr.content)} bytes)")
+        # A near-content-free page whose only job is a meta refresh is a
+        # redirect, not a homepage; follow it once, same site only.
+        if parsed.meta_refresh_url and parsed.text_chars < 200 and hop == 0:
+            disposition, target = fetcher.classify(base, parsed.meta_refresh_url)
+            if disposition == "internal" and target != fetch_url:
+                fetch_url = target
+                continue
+        break
 
     external: list[str] = []   # occurrence descriptions for TP-01
     cookies: list[str] = []

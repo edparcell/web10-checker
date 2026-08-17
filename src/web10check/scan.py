@@ -46,6 +46,9 @@ class ParsedPage:
     inline_css: list[str] = field(default_factory=list)
     # Links for spidering
     anchors: list[str] = field(default_factory=list)
+    # Served-page plausibility signals
+    text_chars: int = 0
+    meta_refresh_url: str | None = None
 
 
 _SRCSET_URL = re.compile(r"(?:^|,)\s*(\S+)")
@@ -79,16 +82,24 @@ def parse_html(html: str) -> ParsedPage:
         page.title = soup.title.string.strip() or None
 
     for meta in soup.find_all("meta"):
+        http_equiv = (meta.get("http-equiv") or "").lower()
         if meta.get("charset"):
             page.meta_charset = meta["charset"]
-        elif (meta.get("http-equiv") or "").lower() == "content-type":
+        elif http_equiv == "content-type":
             content = meta.get("content") or ""
             if "charset=" in content.lower():
                 page.meta_charset = content.split("=")[-1].strip()
+        elif http_equiv == "refresh":
+            m = re.search(r"url\s*=\s*['\"]?([^'\";]+)",
+                          meta.get("content") or "", re.IGNORECASE)
+            if m:
+                page.meta_refresh_url = m.group(1).strip()
 
     # Ignore <noscript> content: it is what a conforming visitor sees anyway.
     for noscript in soup.find_all("noscript"):
         noscript.decompose()
+
+    page.text_chars = len(" ".join(soup.get_text().split()))
 
     for script in soup.find_all("script"):
         src = script.get("src")
