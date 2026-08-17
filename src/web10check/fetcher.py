@@ -41,7 +41,12 @@ _BROWSER_HEADERS = {
     "Sec-Fetch-User": "?1",
     "Upgrade-Insecure-Requests": "1",
 }
-_FETCH_ERRORS = (httpx.HTTPError, httpx.InvalidURL, httpx.CookieConflict, ValueError)
+# Fetches fail with anything from DNS errors to raw h2 protocol violations
+# (some servers send bodies on zero-length responses, which surfaces as an
+# h2 exception outside httpx's hierarchy). At this boundary every exception
+# means the same thing - the fetch failed - and a malformed server must
+# never crash a sweep.
+_FETCH_ERRORS = (Exception,)
 
 
 @dataclass
