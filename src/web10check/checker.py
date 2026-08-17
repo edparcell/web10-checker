@@ -42,6 +42,11 @@ def check_page(fetcher, url: str) -> PageResult:
         if not fr.text.strip():
             return PageResult(url=url, ok=False, status=fr.status,
                               error=f"empty response (HTTP {fr.status})")
+        ctype = (fr.content_type or "").lower()
+        if ctype and "html" not in ctype:
+            return PageResult(url=url, ok=False, status=fr.status,
+                              error="response is not HTML "
+                                    f"({ctype.split(';')[0].strip()})")
         base = fr.final_url
         parsed = parse_html(fr.text)
         if (parsed.title and len(fr.content) < 8192

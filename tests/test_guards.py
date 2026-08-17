@@ -23,6 +23,13 @@ def test_real_minimal_page_is_still_graded(check_html):
     assert check_html(CLEAN_PAGE).ok
 
 
+def test_non_html_response_is_unassessable(check_html):
+    result = check_html('{"error": "over capacity", "status": 403}',
+                        html_content_type="application/json")
+    assert not result.ok
+    assert "not HTML" in result.error
+
+
 def test_meta_refresh_stub_follows_to_real_page(check_html):
     stub = ('<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">'
             '<title>Home</title>'
