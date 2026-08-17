@@ -69,6 +69,6 @@ year of certification. Grades D and F are a **fail**.
 
 ## Versioning
 
-This is the **2026 Edition**. The badge is date-stamped; a certification ages
-out with its year, like a tax disc. Substantive rule changes require a new
-edition.
+This is the **2026 Edition**. The badge carries its year like a hallmark's
+date letter; a certification speaks only for the year it was earned.
+Substantive rule changes require a new edition.
