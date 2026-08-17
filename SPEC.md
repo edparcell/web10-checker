@@ -2,8 +2,8 @@
 
 **Certified Web 1.0** is a conformance standard for websites that respect their
 visitors: no scripts, no surveillance, no third parties, no bloat. HTML and CSS
-only. A conforming site needs no cookie banner because there is nothing to
-consent to.
+only. A conforming site sets no cookies and sends nothing to third parties, so
+it has no need for a cookie banner.
 
 Conformance is assessed per page. Faults are classified as **major** or
 **minor**: a major fault fails the page outright, minor faults accumulate.
