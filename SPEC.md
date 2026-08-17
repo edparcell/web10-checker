@@ -55,7 +55,7 @@ year of certification. Grades D and F are a **fail**.
 
 - Conformance is testable externally: fetch the page, parse the HTML, fetch
   first-party CSS, and enumerate referenced resources. No script execution is
-  required — which is rather the point.
+  required - which is rather the point.
 - The checker never fetches third-party resources; their presence alone is the
   fault. Transfer weight therefore counts first-party bytes only, measured
   uncompressed (what the browser must actually process).

@@ -1,4 +1,4 @@
-"""web10 — test pages and sites against the Web 1.0 Specification (2026)."""
+"""web10 - test pages and sites against the Web 1.0 Specification (2026)."""
 
 from __future__ import annotations
 

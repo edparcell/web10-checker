@@ -1,5 +1,5 @@
 """Reports: text, JSON, and a self-conforming HTML report (no scripts,
-no third parties, system fonts — the report practices what it preaches)."""
+no third parties, system fonts - the report practices what it preaches)."""
 
 from __future__ import annotations
 
@@ -18,7 +18,7 @@ def _fmt_bytes(n: int) -> str:
 
 def to_text(site: SiteResult) -> str:
     lines = []
-    lines.append("Certified Web 1.0 — conformance report")
+    lines.append("Certified Web 1.0 - conformance report")
     lines.append(f"Spec edition: {site.spec_edition}")
     if site.checked_at:
         lines.append(f"Checked: {site.checked_at}")
@@ -28,7 +28,7 @@ def to_text(site: SiteResult) -> str:
         lines.append("")
     if site.grade:
         verdict = "PASS" if is_pass(site.grade) else "FAIL"
-        lines.append(f"Overall grade: {site.grade} ({verdict}) — {VERDICTS[site.grade]}")
+        lines.append(f"Overall grade: {site.grade} ({verdict}) - {VERDICTS[site.grade]}")
         if len(site.pages) > 1:
             lines.append("(a site is graded by its worst page)")
     else:
@@ -49,7 +49,7 @@ def _page_text(page: PageResult) -> list[str]:
         mark = "pass" if rr.passed else ("MAJOR" if rr.severity == "major" else "minor")
         lines.append(f"   [{mark:>5}] {rr.rule_id} {rr.name}")
         for occ in rr.occurrences[:5]:
-            lines.append(f"           - {occ}")
+            lines.append(f" - {occ}")
         if len(rr.occurrences) > 5:
             lines.append(f"           ... and {len(rr.occurrences) - 5} more")
     return lines
@@ -67,7 +67,7 @@ _HTML_HEAD = """<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Certified Web 1.0 — conformance report</title>
+<title>Certified Web 1.0 - conformance report</title>
 <style>
 body {{ font-family: Georgia, 'Times New Roman', serif; max-width: 46rem;
        margin: 2rem auto; padding: 0 1rem; line-height: 1.5; color: #222; }}
@@ -84,7 +84,7 @@ footer {{ margin-top: 3rem; font-size: 0.85em; color: #777; }}
 </style>
 </head>
 <body>
-<h1>Certified Web 1.0 &mdash; conformance report</h1>
+<h1>Certified Web 1.0 - conformance report</h1>
 <p>Spec edition {edition}.{checked}</p>
 """
 
@@ -116,7 +116,7 @@ def _page_html(page: PageResult) -> str:
         return "".join(out)
     cls = "pass" if is_pass(page.grade or "F") else "fail"
     out.append(
-        f"<p>Grade <strong class='{cls}'>{page.grade}</strong> &mdash; "
+        f"<p>Grade <strong class='{cls}'>{page.grade}</strong> - "
         f"{page.majors} major, {page.minors} minor; "
         f"{_fmt_bytes(page.weight_bytes)} first-party transfer, "
         f"{page.request_count} requests.</p>"
