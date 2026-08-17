@@ -1,13 +1,15 @@
 [project]
 name = "web10-checker"
-version = "0.2.0"
+version = "0.3.0"
 description = "Conformance checker for the Web 1.0 Specification (2026 Edition): no scripts, no third parties, no cookies, no bloat."
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
 authors = [{ name = "Ed Parcell" }]
 dependencies = [
-    "requests>=2.31",
+    # HTTP/2 with browser-shaped headers, so edges (Cloudflare especially)
+    # serve the checker what they serve real visitors.
+    "httpx[http2]>=0.27",
     "beautifulsoup4>=4.12",
     # Some CDNs (Berkshire Hathaway's, notably) send brotli regardless of
     # Accept-Encoding; without decoders the checker would grade gibberish.

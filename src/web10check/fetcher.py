@@ -18,13 +18,30 @@ from dataclasses import dataclass
 from pathlib import Path
 from urllib.parse import urldefrag, urljoin, urlsplit
 
-import requests
+import httpx
 
 from .origins import same_site
 
-DEFAULT_UA = "web10-checker/0.1 (Certified Web 1.0 conformance test)"
+DEFAULT_UA = "web10-checker/0.3 (Certified Web 1.0 conformance test)"
 _RESOURCE_BYTE_CAP = 4 * 1024 * 1024
 _SKIP_SCHEMES = ("mailto:", "tel:", "data:", "about:", "javascript:", "ftp:", "gopher:", "gemini:")
+
+# Requests are shaped like a browser's (HTTP/2, full header set) so that
+# edges serve what they serve real visitors. Cloudflare, for example, only
+# injects its analytics beacon into responses for traffic it believes is a
+# browser; a bare HTTP/1.1 fetch receives an artificially clean page and
+# would grade it A while actual visitors get a tracking script.
+_BROWSER_HEADERS = {
+    "Accept": ("text/html,application/xhtml+xml,application/xml;q=0.9,"
+               "image/avif,image/webp,*/*;q=0.8"),
+    "Accept-Language": "en-US,en;q=0.9",
+    "Sec-Fetch-Dest": "document",
+    "Sec-Fetch-Mode": "navigate",
+    "Sec-Fetch-Site": "none",
+    "Sec-Fetch-User": "?1",
+    "Upgrade-Insecure-Requests": "1",
+}
+_FETCH_ERRORS = (httpx.HTTPError, httpx.InvalidURL, httpx.CookieConflict, ValueError)
 
 
 @dataclass
@@ -41,24 +58,26 @@ class FetchResult:
 
 class HttpFetcher:
     def __init__(self, user_agent: str = DEFAULT_UA, timeout: float = 20.0):
-        self.session = requests.Session()
-        self.session.headers["User-Agent"] = user_agent
-        self.timeout = timeout
+        headers = dict(_BROWSER_HEADERS)
+        headers["User-Agent"] = user_agent
+        self.client = httpx.Client(http2=True, headers=headers,
+                                   timeout=timeout, follow_redirects=True)
 
     def fetch_page(self, url: str) -> FetchResult:
         try:
-            resp = self.session.get(url, timeout=self.timeout)
-        except requests.RequestException as exc:
-            return FetchResult(url, url, None, b"", "", "", False, error=str(exc))
+            resp = self.client.get(url)
+        except _FETCH_ERRORS as exc:
+            return FetchResult(url, url, None, b"", "", "", False,
+                               error=str(exc) or type(exc).__name__)
         error = None if resp.status_code < 400 else f"HTTP {resp.status_code}"
         return FetchResult(
             url=url,
-            final_url=resp.url,
+            final_url=str(resp.url),
             status=resp.status_code,
             content=resp.content,
             text=resp.text,
             content_type=resp.headers.get("Content-Type", ""),
-            set_cookie="Set-Cookie" in resp.headers,
+            set_cookie="set-cookie" in resp.headers,
             error=error,
         )
 
@@ -79,21 +98,20 @@ class HttpFetcher:
     def resource_size(self, url: str) -> tuple[int | None, bool]:
         set_cookie = False
         try:
-            head = self.session.head(url, timeout=self.timeout, allow_redirects=True)
-            set_cookie = "Set-Cookie" in head.headers
+            head = self.client.head(url)
+            set_cookie = "set-cookie" in head.headers
             length = head.headers.get("Content-Length")
             if length is not None and head.status_code < 400:
                 return int(length), set_cookie
-            resp = self.session.get(url, timeout=self.timeout, stream=True)
-            set_cookie = set_cookie or "Set-Cookie" in resp.headers
             total = 0
-            for chunk in resp.iter_content(chunk_size=65536):
-                total += len(chunk)
-                if total >= _RESOURCE_BYTE_CAP:
-                    break
-            resp.close()
+            with self.client.stream("GET", url) as resp:
+                set_cookie = set_cookie or "set-cookie" in resp.headers
+                for chunk in resp.iter_bytes(65536):
+                    total += len(chunk)
+                    if total >= _RESOURCE_BYTE_CAP:
+                        break
             return total, set_cookie
-        except (requests.RequestException, ValueError):
+        except _FETCH_ERRORS:
             return None, set_cookie
 
     def page_link(self, base_url: str, href: str) -> str | None:
