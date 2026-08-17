@@ -138,7 +138,13 @@ def test_weight_minor_and_major(check_html):
     assert rule(heavy, "WT-01").passed
     obese = check_html(html, sizes={"https://example.com/big.jpg": 3 * 1024 * 1024})
     assert not rule(obese, "WT-01").passed
-    assert rule(obese, "WT-02").passed  # WT-02 yields to WT-01
+    # Over 2 MB fires both weight rules but is counted once, as the major.
+    wt2 = rule(obese, "WT-02")
+    assert not wt2.passed
+    assert wt2.counted == 0
+    assert "counted once, under WT-01" in wt2.occurrences
+    assert obese.minors == 0
+    assert obese.grade == "D"
 
 
 def test_preload_none_media_is_weight_exempt(check_html):

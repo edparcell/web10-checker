@@ -49,7 +49,7 @@ def _page_text(page: PageResult) -> list[str]:
         mark = "pass" if rr.passed else ("MAJOR" if rr.severity == "major" else "minor")
         lines.append(f"   [{mark:>5}] {rr.rule_id} {rr.name}")
         for occ in rr.occurrences[:5]:
-            lines.append(f" - {occ}")
+            lines.append(f"           - {occ}")
         if len(rr.occurrences) > 5:
             lines.append(f"           ... and {len(rr.occurrences) - 5} more")
     return lines
@@ -126,7 +126,12 @@ def _page_html(page: PageResult) -> str:
         if rr.passed:
             result = "<span class='pass'>pass</span>"
         else:
-            label = "MAJOR" if rr.severity == "major" else f"{rr.counted} minor"
+            if rr.severity == "major":
+                label = "MAJOR"
+            elif rr.counted == 0:
+                label = "counted under WT-01"
+            else:
+                label = f"{rr.counted} minor"
             occs = "".join(
                 f"<li>{html.escape(o)}</li>" for o in rr.occurrences[:5]
             )

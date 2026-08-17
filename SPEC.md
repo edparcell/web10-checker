@@ -34,7 +34,7 @@ Minor faults are counted per occurrence, capped at 3 per rule per page.
 | HY-04 | Missing charset | No character-encoding declaration (`<meta charset>` or equivalent). |
 | HY-05 | Missing alt text | An `<img>` without an `alt` attribute. |
 | FT-01 | Web fonts | Any `@font-face` in first-party CSS. |
-| WT-02 | Overweight | Total first-party transfer exceeds **512 KB**. |
+| WT-02 | High transfer | Total first-party transfer exceeds **512 KB**. Transfers over 2 MB are counted once, as WT-01. |
 | RQ-01 | Excessive requests | More than **20** resource requests for a single page. |
 | FR-01 | First-party frame | An `<iframe>` pointing at the page's own origin. (Third-party frames are TP-01, which is major.) |
 

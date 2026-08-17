@@ -75,7 +75,7 @@ RULES = [
      lambda d: d.font_faces),
     ("WT-02", "Transfer over 512 KB", "minor",
      lambda d: [f"total first-party transfer {_fmt_bytes(d.total_bytes)}"]
-     if WEIGHT_MINOR < d.total_bytes <= WEIGHT_MAJOR else []),
+     if d.total_bytes > WEIGHT_MINOR else []),
     ("RQ-01", "Over 20 requests", "minor",
      lambda d: [f"{d.request_count} resource requests"]
      if d.request_count > REQUEST_LIMIT else []),
@@ -100,4 +100,13 @@ def evaluate(data: PageData):
             counted = min(len(occurrences), MINOR_CAP)
             minors += counted
         results.append(RuleResult(rule_id, name, severity, occurrences, counted))
+
+    # A transfer over 2 MB triggers both weight rules; it is counted once,
+    # as the major. WT-02 still reports the fact rather than showing "pass".
+    by_id = {r.rule_id: r for r in results}
+    wt1, wt2 = by_id["WT-01"], by_id["WT-02"]
+    if wt1.occurrences and wt2.occurrences:
+        minors -= wt2.counted
+        wt2.counted = 0
+        wt2.occurrences.append("counted once, under WT-01")
     return results, majors, minors
