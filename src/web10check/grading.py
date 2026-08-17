@@ -1,4 +1,4 @@
-"""Grades, in the manner of the British driving test."""
+"""Grades: a major fault fails the page, minors accumulate."""
 
 from __future__ import annotations
 

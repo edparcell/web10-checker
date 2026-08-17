@@ -6,8 +6,8 @@ only. A conforming site needs no cookie banner because there is nothing to
 consent to.
 
 Conformance is assessed per page. Faults are classified as **major** or
-**minor**, in the manner of the British driving test. A site's grade is the
-grade of its worst page.
+**minor**: a major fault fails the page outright, minor faults accumulate.
+A site's grade is the grade of its worst page.
 
 ## Major faults
 
@@ -40,8 +40,8 @@ Minor faults are counted per occurrence, capped at 3 per rule per page.
 
 ## Grades
 
-| Grade | Criteria | Driving-test verdict |
-|-------|----------|----------------------|
+| Grade | Criteria | Verdict |
+|-------|----------|---------|
 | A | No majors, no minors | A clean sheet. The examiner shakes your hand. |
 | B | No majors, 1–4 minors | Pass. |
 | C | No majors, 5–9 minors | Pass, but the examiner sighs quietly. |

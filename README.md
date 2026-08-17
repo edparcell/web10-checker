@@ -4,8 +4,8 @@ Conformance checker for **[The Web 1.0 Specification (2026 Edition)](SPEC.md)**:
 no scripts, no third parties, no cookies, no bloat. HTML and CSS only.
 
 A conforming site needs no cookie banner, because there is nothing to consent
-to. Faults are graded like the British driving test: majors and minors, grades
-A–F, and grades A–C are a pass.
+to. Faults come in two classes — majors and minors; grades run A–F, and
+grades A–C are a pass.
 
 ## Install
 
