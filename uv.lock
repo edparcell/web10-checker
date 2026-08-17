@@ -327,7 +327,7 @@ wheels = [
 
 [[package]]
 name = "web10-checker"
-version = "0.4.2"
+version = "0.5.0"
 source = { editable = "." }
 dependencies = [
     { name = "beautifulsoup4" },

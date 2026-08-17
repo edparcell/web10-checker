@@ -41,8 +41,8 @@ report.
 | A | No majors, no minors | Pass |
 | B | No majors, 1–4 minors | Pass |
 | C | No majors, 5–9 minors | Pass |
-| D | Exactly 1 major, fewer than 10 minors | Fail |
-| F | 2 or more majors, or 10 or more minors | Fail |
+| D | Exactly 1 major; or no majors and 10 or more minors | Fail |
+| F | 2 or more majors | Fail |
 
 Grades A–C are a **pass** and may display the Certified Web 1.0 badge for the
 year of certification. Grades D and F are a **fail**.

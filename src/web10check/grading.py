@@ -14,9 +14,9 @@ VERDICTS = {
 
 
 def grade(majors: int, minors: int) -> str:
-    if majors >= 2 or minors >= 10:
+    if majors >= 2:
         return "F"
-    if majors == 1:
+    if majors == 1 or minors >= 10:
         return "D"
     if minors == 0:
         return "A"
