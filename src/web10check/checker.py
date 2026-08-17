@@ -45,7 +45,7 @@ def check_page(fetcher, url: str) -> PageResult:
         cookies.append(f"Set-Cookie on {url}")
 
     internal_css: list[tuple[str, str]] = []  # (css_url, disposition source)
-    internal_resources: list[str] = []
+    internal_resources: list[tuple[str, bool]] = []  # (url, weight_exempt)
 
     def note_request(absolute: str) -> bool:
         if absolute in seen_requests:
@@ -53,7 +53,8 @@ def check_page(fetcher, url: str) -> PageResult:
         seen_requests.add(absolute)
         return True
 
-    def classify_ref(ref_url: str, source: str, kind: str, base_url: str) -> None:
+    def classify_ref(ref_url: str, source: str, kind: str, base_url: str,
+                     weight_exempt: bool = False) -> None:
         disposition, absolute = fetcher.classify(base_url, ref_url)
         if disposition == "skip" or not note_request(absolute):
             return
@@ -62,10 +63,10 @@ def check_page(fetcher, url: str) -> PageResult:
         elif kind == "stylesheet":
             internal_css.append((absolute, source))
         else:
-            internal_resources.append(absolute)
+            internal_resources.append((absolute, weight_exempt))
 
     for ref in parsed.refs:
-        classify_ref(ref.url, ref.source, ref.kind, base)
+        classify_ref(ref.url, ref.source, ref.kind, base, ref.weight_exempt)
 
     # Script URLs are resources too: a third-party script is both JS-01 and
     # TP-01, and every script src counts toward requests and weight.
@@ -113,10 +114,11 @@ def check_page(fetcher, url: str) -> PageResult:
             elif depth < _CSS_IMPORT_DEPTH:
                 css_queue.append((absolute, depth + 1))
 
-    # Weigh remaining first-party resources (never fetches third parties)
-    for res_url in internal_resources:
+    # Weigh remaining first-party resources (never fetches third parties).
+    # Weight-exempt media (preload="none") is still checked for cookies.
+    for res_url, weight_exempt in internal_resources:
         size, set_cookie = fetcher.resource_size(res_url)
-        if size:
+        if size and not weight_exempt:
             total_bytes += size
         if set_cookie:
             cookies.append(f"Set-Cookie on {res_url}")

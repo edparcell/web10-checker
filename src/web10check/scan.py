@@ -20,6 +20,7 @@ class RawRef:
     url: str
     kind: str  # stylesheet | image | media | frame | preload | icon | object
     source: str  # short description of where it was found, e.g. "<img src>"
+    weight_exempt: bool = False  # media with preload="none" loads on demand
 
 
 @dataclass
@@ -134,20 +135,27 @@ def parse_html(html: str) -> ParsedPage:
         if img.get("alt") is None:
             page.imgs_missing_alt.append(_describe(img))
 
+    def _preload_none(tag) -> bool:
+        return (tag.get("preload") or "").lower() == "none"
+
     for source in soup.find_all("source"):
+        parent = source.parent
+        exempt = (parent is not None and parent.name in ("video", "audio")
+                  and _preload_none(parent))
         src = source.get("src")
         if src and not src.startswith("data:"):
-            page.refs.append(RawRef(src, "media", "<source src>"))
+            page.refs.append(RawRef(src, "media", "<source src>", exempt))
         for u in _srcset_urls(source.get("srcset") or ""):
-            page.refs.append(RawRef(u, "media", "<source srcset>"))
+            page.refs.append(RawRef(u, "media", "<source srcset>", exempt))
 
     for tag_name in ("video", "audio"):
         for tag in soup.find_all(tag_name):
             src = tag.get("src")
             if src:
-                page.refs.append(RawRef(src, "media", f"<{tag_name} src>"))
+                page.refs.append(
+                    RawRef(src, "media", f"<{tag_name} src>", _preload_none(tag)))
             poster = tag.get("poster")
-            if poster:
+            if poster:  # posters load eagerly, so they are never exempt
                 page.refs.append(RawRef(poster, "image", f"<{tag_name} poster>"))
             if tag.has_attr("autoplay"):
                 page.autoplay.append(_describe(tag))

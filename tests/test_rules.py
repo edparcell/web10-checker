@@ -141,6 +141,30 @@ def test_weight_minor_and_major(check_html):
     assert rule(obese, "WT-02").passed  # WT-02 yields to WT-01
 
 
+def test_preload_none_media_is_weight_exempt(check_html):
+    html = CLEAN_PAGE.replace(
+        "</body>", '<video controls preload="none" src="big.mp4"></video></body>')
+    result = check_html(html, sizes={"https://example.com/big.mp4": 50 * 1024 * 1024})
+    assert rule(result, "WT-01").passed
+    assert rule(result, "WT-02").passed
+    assert result.request_count == 2  # still counted as a request
+
+
+def test_media_without_preload_none_counts_weight(check_html):
+    html = CLEAN_PAGE.replace(
+        "</body>", '<video controls src="big.mp4"></video></body>')
+    result = check_html(html, sizes={"https://example.com/big.mp4": 50 * 1024 * 1024})
+    assert not rule(result, "WT-01").passed
+
+
+def test_source_child_inherits_preload_exemption(check_html):
+    html = CLEAN_PAGE.replace(
+        "</body>",
+        '<video controls preload="none"><source src="big.webm"></video></body>')
+    result = check_html(html, sizes={"https://example.com/big.webm": 50 * 1024 * 1024})
+    assert rule(result, "WT-01").passed
+
+
 def test_over_twenty_requests_is_minor(check_html):
     imgs = "".join(f'<img src="i{n}.png" alt="x">' for n in range(21))
     result = check_html(CLEAN_PAGE.replace("</body>", imgs + "</body>"))
