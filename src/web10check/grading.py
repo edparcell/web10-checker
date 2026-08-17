@@ -5,11 +5,11 @@ from __future__ import annotations
 GRADE_ORDER = "ABCDF"
 
 VERDICTS = {
-    "A": "A clean sheet. The examiner shakes your hand.",
+    "A": "Pass. No faults.",
     "B": "Pass.",
-    "C": "Pass, but the examiner sighs quietly.",
-    "D": "Fail. Rebook when ready.",
-    "F": "Fail. Please surrender your keyboard at the desk.",
+    "C": "Pass.",
+    "D": "Fail.",
+    "F": "Fail.",
 }
 
 

@@ -19,7 +19,7 @@ fault, however many scripts you have. Occurrences are listed in the report.
 | JS-01 | JavaScript | Any `<script>` element (inline or external), any `on*` event-handler attribute, any `javascript:` URL, or any `<link>` that preloads a script (`rel="modulepreload"`, or `rel="preload" as="script"`). |
 | TP-01 | Third-party request | Any resource (stylesheet, image, font, media, frame, preload) referenced from outside the page's own site. Two hosts are the same site if they share a registrable domain (`www.example.com` and `images.example.com` are the same site; `example.com` and `cdn.example.net` are not). Discovered in HTML and in first-party CSS (`url()`, `@import`). |
 | CK-01 | Cookies | Any `Set-Cookie` header on the page or on any first-party resource. |
-| WT-01 | Gross obesity | Total first-party transfer (page plus all first-party resources) exceeds **2 MB**. |
+| WT-01 | Excessive transfer | Total first-party transfer (page plus all first-party resources) exceeds **2 MB**. |
 | AV-01 | Autoplay | Any `<video>` or `<audio>` element with the `autoplay` attribute. |
 
 ## Minor faults
@@ -33,20 +33,20 @@ Minor faults are counted per occurrence, capped at 3 per rule per page.
 | HY-03 | Missing language | No `lang` attribute on `<html>`. |
 | HY-04 | Missing charset | No character-encoding declaration (`<meta charset>` or equivalent). |
 | HY-05 | Missing alt text | An `<img>` without an `alt` attribute. |
-| FT-01 | Web fonts | Any `@font-face` in first-party CSS. System fonts were good enough for the Renaissance. |
+| FT-01 | Web fonts | Any `@font-face` in first-party CSS. |
 | WT-02 | Overweight | Total first-party transfer exceeds **512 KB**. |
-| RQ-01 | Chatty | More than **20** resource requests for a single page. |
+| RQ-01 | Excessive requests | More than **20** resource requests for a single page. |
 | FR-01 | First-party frame | An `<iframe>` pointing at the page's own origin. (Third-party frames are TP-01, which is major.) |
 
 ## Grades
 
-| Grade | Criteria | Verdict |
-|-------|----------|---------|
-| A | No majors, no minors | A clean sheet. The examiner shakes your hand. |
-| B | No majors, 1–4 minors | Pass. |
-| C | No majors, 5–9 minors | Pass, but the examiner sighs quietly. |
-| D | Exactly 1 major, fewer than 10 minors | Fail. Rebook when ready. |
-| F | 2 or more majors, or 10 or more minors | Fail. Please surrender your keyboard at the desk. |
+| Grade | Criteria | Result |
+|-------|----------|--------|
+| A | No majors, no minors | Pass |
+| B | No majors, 1–4 minors | Pass |
+| C | No majors, 5–9 minors | Pass |
+| D | Exactly 1 major, fewer than 10 minors | Fail |
+| F | 2 or more majors, or 10 or more minors | Fail |
 
 Grades A–C are a **pass** and may display the Certified Web 1.0 badge for the
 year of certification. Grades D and F are a **fail**.
@@ -69,6 +69,6 @@ year of certification. Grades D and F are a **fail**.
 
 ## Versioning
 
-This is the **2026 Edition**. The badge carries its year like a hallmark's
-date letter; a certification speaks only for the year it was earned.
-Substantive rule changes require a new edition.
+This is the **2026 Edition**. The badge shows the year it was earned, and a
+certification applies to that year only. Substantive rule changes require a
+new edition.

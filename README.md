@@ -37,7 +37,7 @@ uv run web10 ./public --spider
 
 Report formats: `--format text` (default), `--format json`, or
 `--format html` - the HTML report is itself script-free, third-party-free,
-and set in system fonts, obviously. Write to a file with `-o report.html`.
+and set in system fonts. Write to a file with `-o report.html`.
 
 Exit code is `0` for a pass (grade A–C), `1` for a fail (D or F), `2` if
 nothing could be checked - so it drops straight into CI:

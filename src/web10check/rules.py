@@ -56,7 +56,7 @@ RULES = [
      lambda d: d.external_refs),
     ("CK-01", "Cookies", "major",
      lambda d: d.cookies),
-    ("WT-01", "Gross obesity (over 2 MB)", "major",
+    ("WT-01", "Transfer over 2 MB", "major",
      lambda d: [f"total first-party transfer {_fmt_bytes(d.total_bytes)}"]
      if d.total_bytes > WEIGHT_MAJOR else []),
     ("AV-01", "Autoplaying media", "major",
@@ -73,10 +73,10 @@ RULES = [
      lambda d: d.imgs_missing_alt),
     ("FT-01", "Web fonts", "minor",
      lambda d: d.font_faces),
-    ("WT-02", "Overweight (over 512 KB)", "minor",
+    ("WT-02", "Transfer over 512 KB", "minor",
      lambda d: [f"total first-party transfer {_fmt_bytes(d.total_bytes)}"]
      if WEIGHT_MINOR < d.total_bytes <= WEIGHT_MAJOR else []),
-    ("RQ-01", "Chatty (over 20 requests)", "minor",
+    ("RQ-01", "Over 20 requests", "minor",
      lambda d: [f"{d.request_count} resource requests"]
      if d.request_count > REQUEST_LIMIT else []),
     ("FR-01", "First-party frame", "minor",

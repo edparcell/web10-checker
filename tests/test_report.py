@@ -24,7 +24,7 @@ def test_json_report_round_trips():
     assert data["spec_edition"] == "2026"
 
 
-def test_html_report_practices_what_it_preaches():
+def test_html_report_conforms_to_spec():
     html = to_html(_site(CLEAN_PAGE.replace("</body>", "<script></script></body>")))
     assert "<script" not in html.lower().replace("&lt;script", "")
     assert "http://" not in html and "https://example" in html  # only the checked URL
